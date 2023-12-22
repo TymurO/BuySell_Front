@@ -1,0 +1,35 @@
+<div>
+  <input #fileInput
+    style="display: none"
+    type="file"
+    accept="image/png"
+    (change)="onFileChanged($event)">
+  <button (click)="fileInput.click()">Select File</button>
+  <form #productForm="ngForm" (ngSubmit)="saveProduct(productForm)">
+    <label>Name</label>
+    <input type="text" ngModel name="name" required>
+    <label>Price</label>
+    <input type="number" ngModel name="price" step="0.1" required>
+    <label>Description</label>
+    <input type="text" ngModel name="description" required>
+    <button type="submit" [disabled]="productForm.invalid">
+      <span>Post</span>
+    </button>
+  </form>
+</div>
+<ng-container *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADING_STATE">
+    <svg class="animate-spin h-5 w-5 bg-blue-700">
+    </svg>
+  </ng-container>
+  <ng-container *ngSwitchCase="DataState.LOADED_STATE">
+    <div class="flex flex-wrap w-full">
+      <ng-container *ngFor="let product of appState.appData.data.products;">
+        <app-product [product]="product"></app-product>
+      </ng-container>
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="DataState.ERROR_STATE">
+    Error
+  </ng-container>
+</ng-container>
