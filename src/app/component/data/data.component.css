@@ -1,0 +1,26 @@
+.input-box {
+  width: 500px;
+  height: 300px;
+  border: 2px solid rgba(0, 0, 0, .5);
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.input-data {
+  /*position: relative;*/
+  margin: 30px 0;
+  border-bottom: 2px solid #000;
+}
+
+.input-data input {
+  border: none;
+  outline: none;
+}
+
+.input-data textarea {
+  border: none;
+  outline: none;
+  resize: none;
+}

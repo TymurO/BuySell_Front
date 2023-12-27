@@ -26,12 +26,12 @@ export class DataService {
         catchError(this.handleError)
       );
 
-  // save$ = (product: Product) => <Observable<CustomResponse>>
-  //   this.http.post<CustomResponse>(`${this.apiUrl}/product/save`, product)
-  //     .pipe(
-  //       tap(console.log),
-  //       catchError(this.handleError)
-  //     );
+  delete$ =(productId: number) => <Observable<CustomResponse>>
+    this.http.delete<CustomResponse>(`${this.apiUrl}/product/delete/${productId}`)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     console.log(error);

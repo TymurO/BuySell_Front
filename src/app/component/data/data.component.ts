@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {catchError, map, Observable, of, startWith} from "rxjs";
+import {BehaviorSubject, catchError, map, Observable, of, startWith} from "rxjs";
 import {DataService} from "../../service/data.service";
 import {CustomResponse} from "../../interface/custom-response";
 import {AppState} from "../../interface/app-state";
@@ -17,14 +17,17 @@ export class DataComponent implements OnInit {
   appState$: Observable<AppState<CustomResponse>>;
   selectedFile: File;
   readonly DataState = DataState;
+  private dataSubject = new BehaviorSubject<CustomResponse>(null);
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
+    console.log('OK')
     this.appState$ = this.dataService.servers$
       .pipe(
         map(response => {
-          return { dataState: DataState.LOADED_STATE, appData: response }
+          this.dataSubject.next(response);
+          return { dataState: DataState.LOADED_STATE, appData: { ...response, data: { products: response.data.products.reverse() } } }
         }),
         startWith({ dataState: DataState.LOADING_STATE }),
         catchError((error: string) => {
@@ -44,25 +47,32 @@ export class DataComponent implements OnInit {
     this.appState$ = this.dataService.save$(uploadData)
       .pipe(
         map(response => {
-          return { dataState: DataState.LOADED_STATE, appData: response }
+          this.dataSubject.next(
+            { ...response, data: { products: [response.data.product, ...this.dataSubject.value.data.products] } }
+          );
+          productForm.resetForm();
+          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
         }),
-        startWith({ dataState: DataState.LOADING_STATE }),
+        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
         catchError((error: string) => {
           return of({ dataState: DataState.ERROR_STATE, error })
         })
       );
   }
 
-  // saveProduct(productForm: NgForm): void {
-  //   this.appState$ = this.dataService.save$(productForm.value as Product)
-  //     .pipe(
-  //       map(response => {
-  //         return { dataState: DataState.LOADED_STATE, appData: response }
-  //       }),
-  //       startWith({ dataState: DataState.LOADING_STATE }),
-  //       catchError((error: string) => {
-  //         return of({ dataState: DataState.ERROR_STATE, error })
-  //       })
-  //     );
-  // }
+  deleteProduct(product: Product): void {
+    this.appState$ = this.dataService.delete$(product.id)
+      .pipe(
+        map(response => {
+          this.dataSubject.next(
+            { ...response, data: { products: this.dataSubject.value.data.products.filter(p => p.id !== product.id) } }
+          );
+          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
+        }),
+        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
+        catchError((error: string) => {
+          return of({ dataState: DataState.ERROR_STATE, error })
+        })
+      );
+  }
 }
