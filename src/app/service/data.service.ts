@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {catchError, Observable, tap} from "rxjs";
 import {CustomResponse} from "../interface/custom-response";
-import {Product} from "../interface/product";
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +20,28 @@ export class DataService {
 
   save$ = (data: FormData) => <Observable<CustomResponse>>
     this.http.post<CustomResponse>(`${this.apiUrl}/product/save`, data)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
+  filter$ = (name: string, response: CustomResponse) => <Observable<CustomResponse>>
+    new Observable<CustomResponse>(
+      subscriber => {
+        subscriber.next(
+          name === "" ? { ...response, message: `Products isn't filtered` } :
+            {
+              ...response,
+              message: response.data.products
+                .filter(product => (product.name.toLowerCase()).includes(name.toLowerCase())).length > 0 ? `Products filtered by ${name}`
+                : 'No products found',
+              data: { products: response.data.products
+                .filter(product => (product.name.toLowerCase()).includes(name.toLowerCase())) }
+            }
+        );
+        subscriber.complete();
+      }
+    )
       .pipe(
         tap(console.log),
         catchError(this.handleError)

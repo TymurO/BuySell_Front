@@ -36,7 +36,7 @@ export class DataComponent implements OnInit {
       );
   }
 
-  onFileChanged(event: any) {
+  onFileChanged(event: any): void {
     this.selectedFile = event.target.files[0];
   }
 
@@ -56,6 +56,19 @@ export class DataComponent implements OnInit {
         startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
         catchError((error: string) => {
           return of({ dataState: DataState.ERROR_STATE, error })
+        })
+      );
+  }
+
+  filterProducts(event: any): void {
+    this.appState$ = this.dataService.filter$(event.target.value, this.dataSubject.value)
+      .pipe(
+        map(response => {
+          return { dataState: DataState.LOADED_STATE, appData: response };
+        }),
+        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
+        catchError((error: string) => {
+          return of({ dataState: DataState.ERROR_STATE, error });
         })
       );
   }

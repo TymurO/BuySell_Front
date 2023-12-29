@@ -29,11 +29,13 @@
     <input #fileInput
            style="display: none"
            type="file"
-           accept="image/png"
            (change)="onFileChanged($event)">
     <button (click)="fileInput.click()">Select File</button>
     <span *ngIf="selectedFile" class="ml-4">{{ selectedFile.name }}</span>
   </div>
+</div>
+<div class="text-center">
+  <input (input)="filterProducts($event)" class="outline-0 w-1/4 border border-black rounded-lg p-0.5 pl-2" type="text" placeholder="Search">
 </div>
 <ng-container *ngIf="(appState$ | async) as appState" [ngSwitch]="appState.dataState">
   <ng-container *ngSwitchCase="DataState.LOADING_STATE">
@@ -41,10 +43,12 @@
     </svg>
   </ng-container>
   <ng-container *ngSwitchCase="DataState.LOADED_STATE">
-    <div class="flex flex-wrap w-full">
+    <div class="flex flex-wrap w-max mx-52 mt-4">
       <ng-container *ngFor="let product of appState.appData.data.products;">
-        <app-product [product]="product"></app-product>
-        <button (click)="deleteProduct(product)">Delete</button>
+        <div class="flex-col border-2 border-gray-900 m-2 w-1/7 h-60">
+          <app-product [product]="product"></app-product>
+          <button class="accent-red-600" (click)="deleteProduct(product)">Delete</button>
+        </div>
       </ng-container>
     </div>
   </ng-container>
