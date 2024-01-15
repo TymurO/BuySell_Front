@@ -2,24 +2,41 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import {catchError, Observable, tap} from "rxjs";
 import {CustomResponse} from "../interface/custom-response";
+import {RegistrationUserDto} from "../interface/registration-user-dto";
+import {JwtRequest} from "../interface/jwt-request";
+import {constants} from "../constant/constants";
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataService {
-  private readonly apiUrl = 'http://localhost:8080';
+  // private readonly apiUrl = 'http://13.60.18.34';
 
   constructor(private http: HttpClient) {}
 
   servers$= <Observable<CustomResponse>>
-    this.http.get<CustomResponse>(`${this.apiUrl}/product/list`)
+    this.http.get<CustomResponse>(`${constants.apiUrl}/product/list`)
       .pipe(
         tap(console.log),
         catchError(this.handleError)
       );
 
   save$ = (data: FormData) => <Observable<CustomResponse>>
-    this.http.post<CustomResponse>(`${this.apiUrl}/product/save`, data)
+    this.http.post<CustomResponse>(`${constants.apiUrl}/product/save`, data)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
+  reg$ = (user: RegistrationUserDto) => <Observable<CustomResponse>>
+    this.http.post<CustomResponse>(`${constants.apiUrl}/user/reg`, user)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
+  login$ = (user: JwtRequest) => <Observable<CustomResponse>>
+    this.http.post<CustomResponse>(`${constants.apiUrl}/user/auth`, user)
       .pipe(
         tap(console.log),
         catchError(this.handleError)
@@ -48,7 +65,7 @@ export class DataService {
       );
 
   delete$ =(productId: number) => <Observable<CustomResponse>>
-    this.http.delete<CustomResponse>(`${this.apiUrl}/product/delete/${productId}`)
+    this.http.delete<CustomResponse>(`${constants.apiUrl}/product/delete/${productId}`)
       .pipe(
         tap(console.log),
         catchError(this.handleError)

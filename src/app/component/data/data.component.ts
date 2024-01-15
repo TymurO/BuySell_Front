@@ -6,6 +6,8 @@ import {AppState} from "../../interface/app-state";
 import {DataState} from "../../enum/data-state.enum";
 import {NgForm} from "@angular/forms";
 import {Product} from "../../interface/product";
+import {RegistrationUserDto} from "../../interface/registration-user-dto";
+import {JwtRequest} from "../../interface/jwt-request";
 
 @Component({
   selector: 'app-data',
@@ -16,13 +18,13 @@ export class DataComponent implements OnInit {
 
   appState$: Observable<AppState<CustomResponse>>;
   selectedFile: File;
+  addForm: boolean = false;
   readonly DataState = DataState;
   private dataSubject = new BehaviorSubject<CustomResponse>(null);
 
   constructor(private dataService: DataService) {}
 
   ngOnInit(): void {
-    console.log('OK')
     this.appState$ = this.dataService.servers$
       .pipe(
         map(response => {
@@ -34,6 +36,10 @@ export class DataComponent implements OnInit {
           return of({ dataState: DataState.ERROR_STATE, error })
         })
       );
+  }
+
+  changeAddForm() {
+    this.addForm = !this.addForm;
   }
 
   onFileChanged(event: any): void {
@@ -51,6 +57,34 @@ export class DataComponent implements OnInit {
             { ...response, data: { products: [response.data.product, ...this.dataSubject.value.data.products] } }
           );
           productForm.resetForm();
+          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
+        }),
+        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
+        catchError((error: string) => {
+          return of({ dataState: DataState.ERROR_STATE, error })
+        })
+      );
+  }
+
+  regUser(regForm: NgForm): void {
+    this.appState$ = this.dataService.reg$(regForm.value as RegistrationUserDto)
+      .pipe(
+        map(response => {
+          regForm.resetForm();
+          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
+        }),
+        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
+        catchError((error: string) => {
+          return of({ dataState: DataState.ERROR_STATE, error })
+        })
+      );
+  }
+
+  loginUser(loginForm: NgForm): void {
+    this.appState$ = this.dataService.login$(loginForm.value as JwtRequest)
+      .pipe(
+        map(response => {
+          loginForm.resetForm();
           return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
         }),
         startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),

@@ -1,4 +1,5 @@
-<div class="input-box">
+<button (click)="changeAddForm()">Add product</button>
+<div *ngIf="addForm" class="input-box">
   <form #productForm="ngForm" (ngSubmit)="saveProduct(productForm)">
     <div class="input-data">
       <input type="text" ngModel name="name" placeholder="Name" required>
@@ -33,6 +34,35 @@
     <button (click)="fileInput.click()">Select File</button>
     <span *ngIf="selectedFile" class="ml-4">{{ selectedFile.name }}</span>
   </div>
+</div>
+<div class="input-box">
+  <form #regForm="ngForm" (ngSubmit)="regUser(regForm)">
+    <div class="input-data">
+      <input type="text" ngModel name="username" placeholder="username" required>
+    </div>
+    <div class="input-data">
+      <input type="text" ngModel name="password" placeholder="password" required>
+    </div>
+    <div class="input-data">
+      <input type="text" ngModel name="confirmPassword" placeholder="confirm password" required>
+    </div>
+    <button type="submit" [disabled]="regForm.invalid">
+      <span>Confirm</span>
+    </button>
+  </form>
+</div>
+<div class="input-box">
+  <form #loginForm="ngForm" (ngSubmit)="loginUser(loginForm)">
+    <div class="input-data">
+      <input type="text" ngModel name="username" placeholder="username" required>
+    </div>
+    <div class="input-data">
+      <input type="text" ngModel name="password" placeholder="password" required>
+    </div>
+    <button type="submit" [disabled]="loginForm.invalid">
+      <span>Login</span>
+    </button>
+  </form>
 </div>
 <div class="text-center">
   <input (input)="filterProducts($event)" class="outline-0 w-1/4 border border-black rounded-lg p-0.5 pl-2" type="text" placeholder="Search">
